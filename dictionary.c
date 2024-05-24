@@ -233,3 +233,109 @@ int newDataAttribute(const char * filename, const char* entityName, Attribute *d
 
     return operationResult;
 }
+
+
+int deleteDataAttribute(const char * filename, const char* entityName, const char* attributeName)
+{
+    int operationResult = EXIT_SUCCESS;
+    FILE *file = fopen(filename, "r+b");
+
+    long attributePointer = searchDataEntity(file, MAIN_HEADER_POSITION, entityName);
+
+    if(attributePointer == -1)
+    {
+        fprintf(stderr, "Entity not found.\n");
+        return EXIT_FAILURE;
+    }
+
+    attributePointer += ENTITY_NAME_LENGTH + sizeof(int)*2;
+    
+
+    if(file) {
+      
+        if(removeAttribute(file, attributePointer,attributeName) != EXIT_SUCCESS)
+        {
+           fprintf(stderr, "Failed to remove the attribute.\n");
+           operationResult = EXIT_FAILURE;
+        }
+            
+    }
+    else {
+        fprintf(stderr, "Failed to open the data dictionary.\n");
+        operationResult = EXIT_FAILURE;
+    }
+
+    if(file) {
+        fclose(file);
+    }
+
+    return operationResult;
+}
+
+
+
+int modifyAttribute(const char* nameDataDictionary, const char *entityName, const char* oldAttribute, const char* newAttribute)
+{
+    FILE *dataDictionary = fopen(nameDataDictionary, "r+b");
+    long headerValue = -1;
+    
+    long currentAttributePointer = searchDataEntity(dataDictionary, MAIN_HEADER_POSITION, entityName);
+    if (currentAttributePointer == -1L)
+    {
+        printf("Entity not found.\n");
+        return EXIT_FAILURE;
+    }
+
+    currentAttributePointer += ENTITY_NAME_LENGTH + sizeof(long);
+
+    fseek(dataDictionary, currentAttributePointer , SEEK_SET);
+    fread(&headerValue, sizeof(long), 1, dataDictionary);
+
+    if(headerValue == -1)
+    {
+        printf("No attributes.\n");
+    }
+    else
+    {
+
+        fseek(dataDictionary, headerValue, SEEK_SET);
+        long nextAttributePointer;
+        char currentAttributeName[ATTRIBUTE_NAME_LENGTH];
+        fread(&currentAttributeName, sizeof(char), ATTRIBUTE_NAME_LENGTH, dataDictionary);
+        nextAttributePointer = ftell(dataDictionary) + sizeof(int)*2;
+
+        while(strcmp(currentAttributeName, oldAttribute) != 0 && nextAttributePointer != -1L)
+        {
+            fseek(dataDictionary, nextAttributePointer, SEEK_SET);
+            fread(&headerValue, sizeof(long), 1, dataDictionary);
+
+            fseek(dataDictionary, headerValue, SEEK_SET);
+            fread(&currentAttributeName, sizeof(char), ATTRIBUTE_NAME_LENGTH, dataDictionary);
+            nextAttributePointer = ftell(dataDictionary) + sizeof(int)*2;
+        }
+       
+       if(nextAttributePointer == -1L)
+         {
+              printf("Attribute not found.\n");
+              return EXIT_FAILURE;
+         }
+
+        fseek(dataDictionary, headerValue + ATTRIBUTE_NAME_LENGTH, SEEK_SET);
+        int type , length;
+        fread(&type, sizeof(int), 1, dataDictionary);
+        fread(&length, sizeof(int), 1, dataDictionary);
+        
+        fclose(dataDictionary);
+
+        deleteDataAttribute(nameDataDictionary, entityName, oldAttribute);
+        Attribute newAttributeStruct;
+        newAttributeStruct.Type = type;
+        newAttributeStruct.length = length;
+        strcpy(newAttributeStruct.name, newAttribute);
+        newDataAttribute(nameDataDictionary, entityName, &newAttributeStruct);
+
+
+    
+    }
+
+}

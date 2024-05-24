@@ -103,7 +103,7 @@ int processUserSelection(DictionaryMenuOption userSelection) {
     char entityName[MAX_NAME_SIZE];
     char newEntityName[MAX_NAME_SIZE];
     Attribute dataAttribute;
-   
+    char newAttributeName[MAX_NAME_SIZE];
 
     switch (userSelection)
     {
@@ -201,8 +201,34 @@ int processUserSelection(DictionaryMenuOption userSelection) {
                 printf("Error creating the attribute\n");
                 return EXIT_FAILURE;
             }
-
-            
+        case DELETE_ATR:
+            readUserString("Enter the name of the entity to delete the attribute: ", entityName, sizeof(entityName));
+            readUserString("Enter the name of the attribute to delete: ", dataAttribute.name, sizeof(dataAttribute.name));
+            if(deleteDataAttribute(fileName,entityName,dataAttribute.name)==EXIT_SUCCESS)
+            {
+                printf("Attribute deleted successfully\n");
+                return EXIT_SUCCESS;
+            }
+            else
+            {
+                printf("Error deleting the attribute\n");
+                return EXIT_FAILURE;
+            }
+            break;
+        case MOD_ATR:
+            readUserString("Enter the name of the entity to modify the attribute: ", entityName, sizeof(entityName));
+            readUserString("Enter the name of the attribute to modify: ", dataAttribute.name, sizeof(dataAttribute.name));
+            readUserString("Enter the new name of the attribute: ", newAttributeName, sizeof(newAttributeName));
+            if(modifyAttribute(fileName,entityName,dataAttribute.name,newAttributeName)==EXIT_SUCCESS)
+            {
+                printf("Attribute modified successfully\n");
+                return EXIT_SUCCESS;
+            }
+            else
+            {
+                printf("Error modifying the attribute\n");
+                return EXIT_FAILURE;
+            }
             break;
 
         default:

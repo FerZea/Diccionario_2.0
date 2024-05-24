@@ -160,7 +160,6 @@ int removeAttribute(FILE *dataDictionary, long pointerAttribute, const char *Att
         else
         {
             
-            nextAttributePointer = ftell(dataDictionary) + sizeof(int)*2;
             return removeAttribute(dataDictionary, nextAttributePointer, AttributeName);
         }
     }
