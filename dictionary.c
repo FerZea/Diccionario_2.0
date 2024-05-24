@@ -20,27 +20,29 @@ int initializeDataDictionary(const char * filename) {
 }
 
 int openDataDictionary(const char * filename) {
-    int opeationResult = EXIT_SUCCESS;
+    int operationResult = EXIT_SUCCESS;
     long header;
     FILE *file = fopen(filename, "rb");
 
     if(file) {
         if (fread(&header, sizeof(header), 1, file) != 1) {
             fprintf(stderr, "Failed to read data.\n");
-            opeationResult = EXIT_FAILURE;
+            operationResult = EXIT_FAILURE;
         }
         else {
             printf("The header value is: %ld\n", header);
         }
+
+        fclose(file);
     }
     else {
         fprintf(stderr, "Failed to open the data dictionary.\n");
-        opeationResult = EXIT_FAILURE;
+        operationResult = EXIT_FAILURE;
     }
 
-    fclose(file);
+    
 
-    return opeationResult;
+    return operationResult;
 }
 
 int newDataEntity(const char * filename, const char * entityName) {
@@ -208,10 +210,7 @@ int newDataAttribute(const char * filename, const char* entityName, Attribute *d
             if(appendAttribute(file, dataAttribute) == EXIT_SUCCESS)
             {
         
-            //fseek(file, attributePointer, SEEK_SET);
-            //long attributeHeader = ftell(file);
-            
-            //reassingAttributePointer(filename, attributeHeader, dataAttribute);
+           
             reassingAttributePointer(file, attributePointer, dataAttribute);
 
             }

@@ -186,9 +186,11 @@ int processUserSelection(DictionaryMenuOption userSelection) {
         case NEW_ATR:
             readUserString("Enter the name of the entity to add the attribute: ", entityName, sizeof(entityName));
             readUserString("Enter the name of the new attribute: ", dataAttribute.name, sizeof(dataAttribute.name));
+            printf("Enter the type of the attribute (0: CHAR, 1: INT, 2: VARCHAR): ");
             int typeAsInt; // Variable temporal para almacenar el valor del enum como int
             fscanf(stdin, "%d", &typeAsInt);
             dataAttribute.Type = (AttributeType)typeAsInt; // Convertir el int a AttributeType
+            printf("Enter the length of the attribute: ");
             fscanf(stdin, "%d", &dataAttribute.length);
             
             if(newDataAttribute(fileName, entityName, &dataAttribute)==EXIT_SUCCESS)
