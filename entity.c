@@ -158,26 +158,27 @@ long searchDataEntity(FILE *dataDictionary, long header, const char *entityName)
 
     fseek(dataDictionary, header, SEEK_SET);
     fread(&headerValue, sizeof(long), 1, dataDictionary);
-
+    printf("Header value %ld of searchEntity \n", headerValue);
     if (headerValue == -1L)
     {
-        printf("Entity not found.\n");
+
        // Close the file before returning
         return headerValue;
     }
     else
     {
         char currentEntityName[ENTITY_NAME_LENGTH];
+       
         long nextHeaderPointer;
 
         // Go to the Entity location and read its data.
         fseek(dataDictionary, headerValue, SEEK_SET);
         fread(&currentEntityName, sizeof(char), ENTITY_NAME_LENGTH, dataDictionary);
 
+
         if (strcmp(currentEntityName, entityName) == 0)
         {
            // Close the file before returning
-           printf("Entity found at position %ld\n", headerValue);
             return headerValue;
         }
         nextHeaderPointer = ftell(dataDictionary) + (sizeof(long) * 2);

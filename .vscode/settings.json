@@ -1,6 +1,7 @@
 {
     "files.associations": {
         "string_view": "c",
-        "attribute.h": "c"
+        "attribute.h": "c",
+        "typeinfo": "c"
     }
 }

@@ -35,7 +35,6 @@ void printAttributeData(FILE *dataDictionary,long currentAtttributePointer)
 
     long headerValue = -1;
     
-    printf("Current pointer: %ld\n", currentAtttributePointer);
     
     fseek(dataDictionary, currentAtttributePointer, SEEK_SET);
     fread(&headerValue, sizeof(headerValue), 1, dataDictionary);
@@ -124,7 +123,7 @@ int removeAttribute(FILE *dataDictionary, long pointerAttribute, const char *Att
     char currentAttributeName[ATTRIBUTE_NAME_LENGTH];
     char currentEntityName[50];
    
-
+    searchAttributePointer(dataDictionary, pointerAttribute, AttributeName);
     //pointerAttribute es el de la entidad a buscar
     fseek(dataDictionary, pointerAttribute, SEEK_SET);
     fread(&headerValue, sizeof(headerValue), 1, dataDictionary);
@@ -163,4 +162,49 @@ int removeAttribute(FILE *dataDictionary, long pointerAttribute, const char *Att
             return removeAttribute(dataDictionary, nextAttributePointer, AttributeName);
         }
     }
+}
+
+
+long searchAttributePointer(FILE *dataDictionary, long currentAttributePointer, const char *attributeName){
+    
+    long headerValue = -1;
+    
+    fseek(dataDictionary, currentAttributePointer, SEEK_SET);
+    fread(&headerValue, sizeof(headerValue), 1, dataDictionary);
+
+    
+    if(headerValue == -1L) 
+    {
+        printf("Attribute not found\n");
+        return -1L;
+        
+    }
+    else {
+        char currentAttributeName[ATTRIBUTE_NAME_LENGTH];
+        long nextAttributeDirection;
+        long nextHeaderPointer;
+
+        // Go to the Attribute location and read its data.
+        fseek(dataDictionary, headerValue, SEEK_SET);
+        // Read the name for the attribute at the current position.
+        fread(&currentAttributeName, sizeof(char), ATTRIBUTE_NAME_LENGTH, dataDictionary); 
+        nextHeaderPointer = ftell(dataDictionary) + sizeof(int)*2;
+        // Compare the Attribute names to determine whether the current attribute should be before the new one or not.
+        printf("Attribute: %s\n", currentAttributeName);
+        printf("Attribute to search: %s\n", attributeName);
+
+        if(strcmp(currentAttributeName, attributeName) == 0) {
+            // Current attribute is before the new one.
+            printf("Attribute found\n");
+            return headerValue;
+           
+        }
+        else {
+            // New attribute should be before the current one.
+            searchAttributePointer(dataDictionary, nextHeaderPointer, attributeName);
+    
+        }
+    }
+    
+    
 }

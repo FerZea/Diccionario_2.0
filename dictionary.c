@@ -53,6 +53,12 @@ int newDataEntity(const char * filename, const char * entityName) {
         Entity dataEntity;
 
         strcpy(dataEntity.Name, entityName);
+
+        if(searchDataEntity(file, MAIN_HEADER_POSITION, entityName) != -1) {
+            fprintf(stderr, "The entity \"%s\" already exists.\n", entityName);
+            return EXIT_FAILURE;
+        }
+
         if(appendEntity(file, &dataEntity) == EXIT_SUCCESS) {
           
             reassignEntityPointers(file, MAIN_HEADER_POSITION, dataEntity.Name, dataEntity.FileDirection);
@@ -198,16 +204,18 @@ int newDataAttribute(const char * filename, const char* entityName, Attribute *d
 {
     int operationResult = EXIT_SUCCESS;
     FILE *file = fopen(filename, "r+b");
+    long attributePointer = searchDataEntity(file, MAIN_HEADER_POSITION, entityName) + ENTITY_NAME_LENGTH + sizeof(long);
 
-    long attributePointer = searchDataEntity(file, MAIN_HEADER_POSITION, entityName);
+    long entityPointerAttribute = searchDataEntity(file, MAIN_HEADER_POSITION, entityName) + ENTITY_NAME_LENGTH + sizeof(long);
+    long attributePointer1 = searchAttributePointer(file, entityPointerAttribute, dataAttribute->name);
 
-    if(attributePointer == -1)
+    printf("%ld",attributePointer1);
+
+    if(attributePointer1 != -1)
     {
-        fprintf(stderr, "Entity not found.\n");
+        fprintf(stderr, "Attribute already exists.\n");
         return EXIT_FAILURE;
     }
-
-    attributePointer += ENTITY_NAME_LENGTH + sizeof(int)*2;
     
 
     if(file) {
@@ -278,12 +286,15 @@ int deleteDataAttribute(const char * filename, const char* entityName, const cha
 
 
 
-int modifyAttribute(const char* nameDataDictionary, const char *entityName, const char* oldAttribute, const char* newAttribute)
+int modifyAttribute(const char* nameDataDictionary, const char *entityName, const char* oldAttribute, Attribute newAttributeStruct)
 {
     FILE *dataDictionary = fopen(nameDataDictionary, "r+b");
     long headerValue = -1;
     
     long currentAttributePointer = searchDataEntity(dataDictionary, MAIN_HEADER_POSITION, entityName);
+    
+    printf("%ld",currentAttributePointer);
+
     if (currentAttributePointer == -1L)
     {
         printf("Entity not found.\n");
@@ -320,33 +331,24 @@ int modifyAttribute(const char* nameDataDictionary, const char *entityName, cons
        
        if(nextAttributePointer == -1L)
          {
-              printf("Attribute not found.\n");
               return EXIT_FAILURE;
          }
 
-        fseek(dataDictionary, headerValue + ATTRIBUTE_NAME_LENGTH, SEEK_SET);
-        int type , length;
-        fread(&type, sizeof(int), 1, dataDictionary);
         
-      
         fclose(dataDictionary);
 
-        if(type == 2)
-        printf("Enter the new length of the attribute: ");
-        fscanf(stdin, "%d", &length);
+            
+        
+
 
         if(deleteDataAttribute(nameDataDictionary, entityName, oldAttribute) == EXIT_FAILURE)
         {
             printf("Doesn't exist the attribute to modify.\n");
             return EXIT_FAILURE;
         }
-        Attribute newAttributeStruct;
-        newAttributeStruct.Type = type;
         
-        newAttributeStruct.length = length;
-        strcpy(newAttributeStruct.name, newAttribute);
-        newDataAttribute(nameDataDictionary, entityName, &newAttributeStruct);
 
+        newDataAttribute(nameDataDictionary, entityName, &newAttributeStruct);
 
     
     }

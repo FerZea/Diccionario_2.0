@@ -22,3 +22,4 @@ int appendAttribute(FILE* dataDictionary, Attribute *attribute);
 void reassingAttributePointer(FILE *dataDictionary, long currentAttributePointer, Attribute *newAttribute);
 void printAttributeData(FILE *dataDictionary,long currentAtttributePointer);
 int removeAttribute(FILE *dataDictionary, long pointerAttribute, const char *AttributeName);
+long searchAttributePointer(FILE *dataDictionary, long currentAttributePointer, const char *attributeName);

@@ -104,6 +104,7 @@ int processUserSelection(DictionaryMenuOption userSelection) {
     char newEntityName[MAX_NAME_SIZE];
     Attribute dataAttribute;
     char newAttributeName[MAX_NAME_SIZE];
+    int typeAsInt;
 
     switch (userSelection)
     {
@@ -144,6 +145,7 @@ int processUserSelection(DictionaryMenuOption userSelection) {
 
         case NEW_ENT:
             readUserString("Enter the name of the new entity: ", entityName, sizeof(entityName));
+            
             if(newDataEntity(fileName, entityName)==EXIT_SUCCESS)
             {
                 printf("Entity created successfully\n");
@@ -152,7 +154,6 @@ int processUserSelection(DictionaryMenuOption userSelection) {
             else
             {
                 printf("Error creating the entity\n");
-                return EXIT_FAILURE;
             }
             break;
 
@@ -185,14 +186,18 @@ int processUserSelection(DictionaryMenuOption userSelection) {
             readUserString("Enter the name of the entity to add the attribute: ", entityName, sizeof(entityName));
             readUserString("Enter the name of the new attribute: ", dataAttribute.name, sizeof(dataAttribute.name));
             printf("Enter the type of the attribute (0: CHAR, 1: INT, 2: VARCHAR): ");
-            int typeAsInt; // Variable temporal para almacenar el valor del enum como int
+            
             fscanf(stdin, "%d", &typeAsInt);
             dataAttribute.Type = (AttributeType)typeAsInt;  // Convertir el int a AttributeType
-            if(typeAsInt == INT || typeAsInt == CHAR)
+            if(typeAsInt == INT)
             {
                 dataAttribute.length = 4;
             }
-            else
+            else if(typeAsInt == CHAR)
+            {
+               dataAttribute.length = 1;
+            }
+            else 
             {
                 printf("Enter the length of the attribute: ");
                 fscanf(stdin, "%d", &dataAttribute.length);
@@ -206,7 +211,6 @@ int processUserSelection(DictionaryMenuOption userSelection) {
             else
             {
                 printf("Error creating the attribute\n");
-                return EXIT_FAILURE;
             }
         case DELETE_ATR:
             readUserString("Enter the name of the entity to delete the attribute: ", entityName, sizeof(entityName));
@@ -225,7 +229,32 @@ int processUserSelection(DictionaryMenuOption userSelection) {
             readUserString("Enter the name of the entity to modify the attribute: ", entityName, sizeof(entityName));
             readUserString("Enter the name of the attribute to modify: ", dataAttribute.name, sizeof(dataAttribute.name));
             readUserString("Enter the new name of the attribute: ", newAttributeName, sizeof(newAttributeName));
-            if(modifyAttribute(fileName,entityName,dataAttribute.name,newAttributeName)==EXIT_SUCCESS)
+            
+            Attribute newAttributeStruct;
+
+            printf("Enter the type of the attribute (0: CHAR, 1: INT, 2: VARCHAR): ");
+            
+            fscanf(stdin, "%d", &typeAsInt);
+            newAttributeStruct.Type = (AttributeType)typeAsInt;  // Convertir el int a AttributeType
+
+            strcpy(newAttributeStruct.name, newAttributeName);
+
+            if(typeAsInt == INT)
+            {
+                newAttributeStruct.length = 4;
+            }
+            else if(typeAsInt == CHAR)
+            {
+                newAttributeStruct.length = 1;
+            }
+            else
+            {
+                printf("Enter the length of the attribute: ");
+                fscanf(stdin, "%d", &newAttributeStruct.length);
+            }
+
+
+            if(modifyAttribute(fileName,entityName,dataAttribute.name,newAttributeStruct)==EXIT_SUCCESS)
             {
                 printf("Attribute modified successfully\n");
                 return EXIT_SUCCESS;
