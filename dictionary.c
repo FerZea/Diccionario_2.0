@@ -139,7 +139,12 @@ int modifyEntity(const char* nameDataDictionary, long currentEntityPointer, cons
             fclose(dataDictionary);
 
             // lo cierra y lo abre de nuevo para que se guarden los cambios
-            removeDataEntity(nameDataDictionary, oldEntity);
+            
+            if(removeDataEntity(nameDataDictionary, oldEntity) == EXIT_FAILURE)
+            {
+                printf("Doesn't exist the entity to modify.\n");
+                return EXIT_FAILURE;
+            }
             newDataEntity(nameDataDictionary, newEntity);
 
             dataDictionary = fopen(nameDataDictionary, "r+b");
@@ -322,13 +327,22 @@ int modifyAttribute(const char* nameDataDictionary, const char *entityName, cons
         fseek(dataDictionary, headerValue + ATTRIBUTE_NAME_LENGTH, SEEK_SET);
         int type , length;
         fread(&type, sizeof(int), 1, dataDictionary);
-        fread(&length, sizeof(int), 1, dataDictionary);
         
+      
         fclose(dataDictionary);
 
-        deleteDataAttribute(nameDataDictionary, entityName, oldAttribute);
+        if(type == 2)
+        printf("Enter the new length of the attribute: ");
+        fscanf(stdin, "%d", &length);
+
+        if(deleteDataAttribute(nameDataDictionary, entityName, oldAttribute) == EXIT_FAILURE)
+        {
+            printf("Doesn't exist the attribute to modify.\n");
+            return EXIT_FAILURE;
+        }
         Attribute newAttributeStruct;
         newAttributeStruct.Type = type;
+        
         newAttributeStruct.length = length;
         strcpy(newAttributeStruct.name, newAttribute);
         newDataAttribute(nameDataDictionary, entityName, &newAttributeStruct);

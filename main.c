@@ -166,7 +166,6 @@ int processUserSelection(DictionaryMenuOption userSelection) {
             else
             {
                 printf("Error deleting the entity\n");
-                return EXIT_FAILURE;
             }
             break;
         case MOD_ENT:
@@ -180,7 +179,6 @@ int processUserSelection(DictionaryMenuOption userSelection) {
             else
             {
                 printf("Error modifying the entity\n");
-                return EXIT_FAILURE;
             }
             break;
         case NEW_ATR:
@@ -189,9 +187,16 @@ int processUserSelection(DictionaryMenuOption userSelection) {
             printf("Enter the type of the attribute (0: CHAR, 1: INT, 2: VARCHAR): ");
             int typeAsInt; // Variable temporal para almacenar el valor del enum como int
             fscanf(stdin, "%d", &typeAsInt);
-            dataAttribute.Type = (AttributeType)typeAsInt; // Convertir el int a AttributeType
-            printf("Enter the length of the attribute: ");
-            fscanf(stdin, "%d", &dataAttribute.length);
+            dataAttribute.Type = (AttributeType)typeAsInt;  // Convertir el int a AttributeType
+            if(typeAsInt == INT || typeAsInt == CHAR)
+            {
+                dataAttribute.length = 4;
+            }
+            else
+            {
+                printf("Enter the length of the attribute: ");
+                fscanf(stdin, "%d", &dataAttribute.length);
+            }
             
             if(newDataAttribute(fileName, entityName, &dataAttribute)==EXIT_SUCCESS)
             {
@@ -214,7 +219,6 @@ int processUserSelection(DictionaryMenuOption userSelection) {
             else
             {
                 printf("Error deleting the attribute\n");
-                return EXIT_FAILURE;
             }
             break;
         case MOD_ATR:
@@ -229,7 +233,6 @@ int processUserSelection(DictionaryMenuOption userSelection) {
             else
             {
                 printf("Error modifying the attribute\n");
-                return EXIT_FAILURE;
             }
             break;
 

@@ -95,9 +95,12 @@ void printEntityData(FILE *dataDictionary, long currentHeaderPointer) {
         // Read the name for the entity at the current position.
         fread(&currentEntityName, sizeof(char), ENTITY_NAME_LENGTH, dataDictionary); 
 
-        printf("Entity: %s\n", currentEntityName);
+        printf("\n");
+        printf("Entity: %s\n\n", currentEntityName);
+        
         nextHeaderPointer = ftell(dataDictionary) + (sizeof(long) * 2);
 
+        
         printAttributeData(dataDictionary, headerValue+ENTITY_NAME_LENGTH+sizeof(long));
         printEntityData(dataDictionary, nextHeaderPointer);
     } 
